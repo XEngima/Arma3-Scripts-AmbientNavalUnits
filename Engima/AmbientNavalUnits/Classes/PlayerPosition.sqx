@@ -1,0 +1,37 @@
+/*
+ * Name:	PlayerPosition
+ * Date:	2017-08-06
+ * Version: 1.0
+ * Author:  Engima
+ *
+ * Description:
+ * Models a player position, with the actual position and the presumed near future position.
+ */
+namespace Engima.AmbientNaval.Classes
+{
+	public class PlayerPosition
+	{
+		// Creates a PlayerPosition object.
+		public constructor {
+			params ["_player" as Object];
+			
+			_self.Player = _player;
+		};
+		
+		public property Object Player { get; private set; };
+		
+		// Gets the position where the player is right now.
+		// Returns (Array): The player's current position.
+		public method Array GetTruePos {
+			getPos _self.Player
+		};
+		
+		// Gets the position where the player will be in a little while if its speed remains constant.
+		// Returns (Array): The position ahead of the player.
+		public method Array GetAheadPos {
+			private _player = _self.Player;
+			private _futurePos = _player getPos [(speed vehicle _player) * 3.6, getDir vehicle _player];
+			_futurePos
+		};
+	};
+};

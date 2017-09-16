@@ -19,9 +19,10 @@ namespace Engima.AmbientNaval.Classes
 	public class AmbientNaval
 	{
 		private fields ["_mConfiguration" as Configuration, "_mNavalGroups" as Array, "_mMissionHasStarted" as Boolean];
+		private fields ["_mMinSpawnDistMarker" as Marker, "_mMaxSpawnDistMarker" as Marker];
 	
-		// Creates a Engine object.
-		// _configuration (Configuration): The configuration for this instance of the
+		// Creates an AmbientNaval object.
+		// _configuration (Configuration): The configuration for this instance of the ambient naval units script.
 		public constructor {
 			params ["_configuration" as Configuration];
 			
@@ -30,6 +31,9 @@ namespace Engima.AmbientNaval.Classes
 			
 			_mNavalGroups = [];
 			_mMissionHasStarted = false;
+			
+			_mMinSpawnDistMarker = classNull;
+			_mMaxSpawnDistMarker = classNull;
 		};
 		
 		// Creates an instance of ambient infantry.
@@ -189,7 +193,7 @@ namespace Engima.AmbientNaval.Classes
 		// _playerPos (Array): The player's position.
 		// Returns (Scalar): Coverage chare for surrounding blacklist markers. 0 if no area is
 		//                   covered by blacklist marker, and 1 if all area is covered.
-		private method Scalar CalculatePlayerBlacklistCoverage {
+		private method Scalar CalculatePlayerWhitelistCoverage {
 			params ["_playerPos" as Array];
 			
 			private _minSpawnDistance = _mConfiguration.MinSpawnDistance;
@@ -238,13 +242,13 @@ namespace Engima.AmbientNaval.Classes
 		// _playerPositions (Array): All players' positions.
 		// Returns (Scalar): The average share of area covered by blacklist markers. 0 = Nothing 
 		// covered, 1 = all covered.
-		private method Scalar CalculateBlacklistCoverage {
+		private method Scalar CalculateWhitelistCoverage {
 			params ["_playerPositions" as Array];
 			
 			private _sumShare = 0;
 			
 			{
-				_sumShare = _sumShare + ([_x] call _self.CalculatePlayerBlacklistCoverage);
+				_sumShare = _sumShare + ([_x] call _self.CalculatePlayerWhitelistCoverage);
 			} foreach _playerPositions as Array;
 			
 			_sumShare / count _playerPositions
@@ -270,7 +274,7 @@ namespace Engima.AmbientNaval.Classes
 				private _playerPositions = call AmbientNaval.GetAllPlayerPositions;
 				
 				if (count _playerPositions > 0) then {
-					private _coveredShare = [_playerPositions] call _self.CalculateBlacklistCoverage;
+					private _coveredShare = [_playerPositions] call _self.CalculateWhitelistCoverage;
 					
 					//_correctedGroupsCount = round (_mConfiguration.MaxGroupsCount * (1 - _coveredShare));
 					_correctedGroupsCount = _mConfiguration.MaxGroupsCount;
